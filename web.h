@@ -40,14 +40,12 @@ const char main_html[] PROGMEM =
   "  </body>\n"
   "</html>\n";
 
-Tertis* tertis_ext;
-
 }  // namespace
 
 class Web {
  public:
   Web(Tertis* tertis) {
-    tertis_ext = tertis;
+    tertis_ = tertis;
   }
   void Init() {
     server_ = new AsyncWebServer(80);
@@ -68,7 +66,7 @@ class Web {
     return ws_->count();
   }
   void BroadcastScore() {
-    ws_->printfAll("Score: %u", tertis_ext->GetScore());
+    ws_->printfAll("Score: %u", tertis_->GetScore());
   }
 
  private:
@@ -90,7 +88,7 @@ class Web {
       Serial.println(client->id());
       ws->printfAll("Player TERT%u has joined (%u players)!", client->id(), ws->count());
       client->printf("Hello, Player TERT%u.", client->id());
-      client->printf("Score: %u", tertis_ext->GetScore());
+      client->printf("Score: %u", tertis_->GetScore());
       client->ping();
     } else if(type == WS_EVT_DISCONNECT){
       // Client disconnected
@@ -124,23 +122,27 @@ class Web {
         return;
       switch (data[0]) {
         case '0':
-          tertis_ext->Rotate();
+          tertis_->Rotate();
           break;
         case '1':
-          tertis_ext->Translate(-1, 0);
+          tertis_->Translate(-1, 0);
           break;
         case '2':
-          tertis_ext->Translate(1, 0);
+          tertis_->Translate(1, 0);
           break;
         case '3':
-          tertis_ext->Start();
+          tertis_->Start();
         default:
           break;
       }    }
   }
 
+  static Tertis* tertis_;
+
   AsyncWebServer* server_;
   AsyncWebSocket* ws_;
 };
+
+Tertis* Web::tertis_;
 
 #endif  // ESP_TERTIS_WEB_H_
