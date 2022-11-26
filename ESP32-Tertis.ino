@@ -7,8 +7,8 @@
 #include "tertis.h"
 #include "web.h"
 
-Display display;
-Tertis tertis(&display);
+SSD1306Display display;
+Tertis tertis((Display*) &display);
 
 DNSServer dns_server;
 Web web(&tertis);
